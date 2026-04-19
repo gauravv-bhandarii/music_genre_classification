@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BeatMind.xo | AI Music Genre Classifier</title>
+    <meta name="description" content="BeatMind.xo — AI-powered music genre classification with live visualizer, game mode, and BPM detection.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="background-effects">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+    </div>
+
+    <!-- HISTORY SIDEBAR -->
+    <aside class="sidebar" id="historySidebar">
+        <h3>Session History</h3>
+        <ul class="history-list" id="historyList">
+            <li class="empty-history" id="emptyHistory">No tracks analyzed yet.</li>
+        </ul>
+    </aside>
+
+    <!-- SCORE BOARD -->
+    <div class="score-board" id="scoreBoard">
+        <span class="score-label">Score</span>
+        <span class="score-value" id="scoreValue">0 / 0</span>
+    </div>
+
+    <!-- SIDEBAR TOGGLE -->
+    <button class="sidebar-toggle" id="sidebarToggle" title="Session History">📋</button>
+
+    <main class="container">
+        <header class="header">
+            <h1 class="title">BeatMind<span class="gradient-text">.xo</span></h1>
+            <p class="subtitle">AI-Powered Music Genre Classification</p>
+        </header>
+
+        <!-- UPLOAD -->
+        <section id="uploadSection">
+            <div class="glass-panel upload-zone" id="uploadZone">
+                <div class="upload-content">
+                    <div class="upload-icon">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="17 8 12 3 7 8"></polyline>
+                            <line x1="12" y1="3" x2="12" y2="15"></line>
+                        </svg>
+                    </div>
+                    <div class="upload-text">
+                        <h3 id="uploadPrompt">Drag &amp; Drop Audio</h3>
+                        <p>or click to browse · mp3, wav, flac, m4a, mp4 and more</p>
+                    </div>
+                </div>
+                <input type="file" id="fileInput" accept=".wav,.mp3,.ogg,.flac,.m4a,.aac,.wma,.mp4,.mov,.avi" hidden>
+            </div>
+            <p class="hint-text">💡 <kbd>Space</kbd> play/pause &nbsp;·&nbsp; <kbd>R</kbd> reset &nbsp;·&nbsp; <kbd>S</kbd> share</p>
+        </section>
+
+        <!-- LOADING -->
+        <section class="loading-section" id="loadingSection" style="display:none;">
+            <div class="glass-panel text-center">
+                <div class="equalizer">
+                    <span></span><span></span><span></span><span></span><span></span>
+                </div>
+                <h3 class="analyzing-text">Analyzing Audio Patterns…</h3>
+                <p>Extracting rhythmic, spectral &amp; tonal features</p>
+            </div>
+        </section>
+
+        <!-- GAME MODE -->
+        <section id="gameSection" style="display:none;">
+            <div class="glass-panel game-card">
+                <div class="game-header">
+                    <span class="game-emoji">🎮</span>
+                    <h2>Guess the Genre!</h2>
+                    <p>What genre do you think this track is?</p>
+                </div>
+                <div class="genre-grid" id="genreGrid"></div>
+                <button class="skip-btn" id="skipGameBtn">Skip → Show AI Result</button>
+            </div>
+        </section>
+
+        <!-- RESULTS -->
+        <section id="resultsSection" style="display:none;">
+            <div class="glass-panel results-card">
+
+                <!-- TRACK INFO -->
+                <div class="track-info-card" id="trackInfoCard" style="display:none;">
+                    <img class="track-art" id="trackArt" src="" alt="Album Art">
+                    <div class="track-details">
+                        <p class="track-title" id="trackTitle">Unknown Track</p>
+                        <p class="track-artist" id="trackArtist">Unknown Artist</p>
+                        <p class="track-album" id="trackAlbum"></p>
+                        <a class="track-video-link" id="trackVideoLink" href="#" target="_blank">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33 2.78 2.78 0 0 0 1.94 2c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.33 29 29 0 0 0-.46-5.33z"/><polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"/></svg>
+                            Watch on YouTube
+                        </a>
+                    </div>
+                </div>
+
+                <!-- PLAYER -->
+                <div class="player-container">
+                    <button id="playPauseBtn" class="play-btn">
+                        <svg id="playIcon" width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                        <svg id="pauseIcon" style="display:none;" width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>
+                    </button>
+                    <div class="vinyl-record" id="vinylRecord">
+                        <div class="vinyl-center"></div>
+                    </div>
+                    <div class="waveform-wrapper">
+                        <canvas id="vizCanvas" class="viz-canvas"></canvas>
+                        <div id="waveform" class="waveform-container"></div>
+                    </div>
+                </div>
+
+                <!-- STATS BAR -->
+                <div class="stats-bar">
+                    <div class="stat-chip">
+                        <span class="stat-icon">🥁</span>
+                        <span class="stat-val" id="bpmVal">— BPM</span>
+                    </div>
+                    <div class="stat-chip">
+                        <span class="stat-icon">🎯</span>
+                        <span class="stat-val" id="confidenceVal">—%</span>
+                    </div>
+                    <div class="stat-chip">
+                        <span class="stat-icon" id="genreEmoji">🎵</span>
+                        <span class="stat-val" id="genreStatVal">—</span>
+                    </div>
+                </div>
+
+                <!-- PRIMARY GENRE -->
+                <div class="primary-result">
+                    <h2>Primary Genre</h2>
+                    <h3 id="primaryGenre" class="gradient-text result-title">Loading…</h3>
+                    <div id="genreBadge" class="genre-badge"></div>
+                    <p class="genre-fact" id="genreFact"></p>
+                </div>
+
+                <!-- CONFIDENCE BARS -->
+                <div class="confidence-bars" id="confidenceBars"></div>
+                <button class="bars-toggle" id="barsToggle" style="display:none;">Show all genres ▾</button>
+
+                <!-- ACTIONS -->
+                <div class="action-buttons">
+                    <button class="action-btn share-btn" id="shareBtn">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path><polyline points="16 6 12 2 8 6"></polyline><line x1="12" y1="2" x2="12" y2="15"></line></svg>
+                        Share Result
+                    </button>
+                    <button class="reset-btn" id="resetBtn">Analyze Another Track</button>
+                </div>
+
+            </div>
+        </section>
+    </main>
+
+    <script src="https://unpkg.com/wavesurfer.js@7/dist/wavesurfer.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

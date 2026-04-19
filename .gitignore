@@ -1,0 +1,12 @@
+.venv/
+__pycache__/
+.pytest_cache/
+*.pyc
+artifacts/
+dataset/
+*.egg-info/
+dist/
+build/
+.env
+test_*.py
+generate_dummy_model.py
