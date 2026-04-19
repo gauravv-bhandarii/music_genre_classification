@@ -44,10 +44,19 @@ def load_dataset(data_dir: str | Path, sample_rate: int = 22050, clip_duration: 
     labels: list[int] = []
     file_paths: list[Path] = []
 
+    skipped = 0
     for genre, audio_path in items:
-        features.append(extract_features(audio_path, sample_rate=sample_rate, clip_duration=clip_duration))
-        labels.append(class_to_index[genre])
-        file_paths.append(audio_path)
+        try:
+            feat = extract_features(audio_path, sample_rate=sample_rate, clip_duration=clip_duration)
+            features.append(feat)
+            labels.append(class_to_index[genre])
+            file_paths.append(audio_path)
+        except Exception as exc:
+            print(f"  ⚠ Skipping {audio_path.name}: {exc}")
+            skipped += 1
+
+    if skipped:
+        print(f"  Skipped {skipped} file(s) due to read errors.")
 
     return GenreDataset(
         features=np.vstack(features),
