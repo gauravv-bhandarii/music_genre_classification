@@ -4,6 +4,7 @@ __pycache__/
 *.pyc
 artifacts/
 dataset/
+Data/
 *.egg-info/
 dist/
 build/
